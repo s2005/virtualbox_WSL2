@@ -67,7 +67,8 @@ module VirtualboxWSL2
 
       # If we run on WSL2, we need to ssh through Windows IP, which is set as the default route
       if Vagrant::Util::Platform.wsl?
-        result = Vagrant::Util::Subprocess.execute("/bin/sh", "-c", "ip route | grep default | grep -Po '\\d+.\\d+.\\d+.\\d+'")
+        wls2_ip_commmand = "ip addr show $(ip r l | grep '^default via ' | awk '{ print $5 }') | awk -F'[ /]+' '$2==\"inet\" {print $3}'"
+        result = Vagrant::Util::Subprocess.execute("/bin/sh", "-c", wls2_ip_commmand)
         if result.exit_code == 0
           host_ip = result.stdout.strip
         end
